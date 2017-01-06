@@ -1,6 +1,6 @@
 #ifndef _CONFPARSER_H_
 #define _CONFPARSER_H
-#include "gpiocontrol.h"
+#include "libem_com.h"
 
 
 int check_conf_file(char *filename);

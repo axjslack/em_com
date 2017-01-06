@@ -1,7 +1,10 @@
-
+/*
 #include "gpiocontrol.h"
 #include "pinmesg.h"
 #include "common.h"
+*/
+
+#include "libem_com.h"
 
 //uint8_t oplist_static[MAX_OPXMESG]
 

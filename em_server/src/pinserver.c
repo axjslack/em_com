@@ -13,9 +13,15 @@
 #include <sys/socket.h>
 #include <arpa/inet.h> //inet_addr
 
+
+/*
 #include "common.h"
 #include "pinmesg.h"
 #include "gpiocontrol.h"
+#include "confparser.h"
+*/
+
+#include "libem_com.h"
 #include "confparser.h"
 
 void null_function()
@@ -101,37 +107,18 @@ int server_main(selector *sel)
     return 0;
 }
 
-void serial_main(serial_port_t sport, selector *confpin)
-{
-		
-}
-
-
-
-
 
 int main(int argc, char *argv[])
 {
 	
 /* The local mapping will disappear in the stable release */	
-#ifdef LOCALMAPPING
-	selector *localpin;
-	
-	error_print("\n NePiCo alpha (test) \n");
 
-
-	localpin=malloc(sizeof(selector));
-	init_localpin(localpin);
-	setdirection_localpin(localpin, OUT);
-	server_main(localpin);
-#else
 	selector *confpin;
 	int pos;
 	
 	/*Serial port or network configuration parameter*/
-	char c,*serport=NULL, *baud=NULL, *ports=NULL, *ip="ipv4"; 
+	char c, *ports=NULL, *ip="ipv4"; 
 	Conn_type_t	connection=undef;
-	serial_port_t	sport;
 	IP_type_t	iptype;
 	
 	error_print("\n NePiCo beta (test) \n");
@@ -147,14 +134,12 @@ int main(int argc, char *argv[])
 	
 	
 	
-	while ((c = getopt (argc, argv, "snc:b:p:i:")) != -1)
+	while ((c = getopt (argc, argv, "np:i:")) != -1)
 	{
 		switch(c)
 		{
-			case 's': connection=serial; break;
+			
 			case 'n': connection=network; break;
-			case 'c': serport = optarg; break;
-			case 'b': baud = optarg; break;
 			case 'p': ports = optarg; break;
 			case 'i': ip = optarg; break;
 			
@@ -172,27 +157,6 @@ int main(int argc, char *argv[])
 	}
 
 
-	if(connection==serial)
-	{
-
-		if(serport==NULL || baud==NULL )
-		{
-			error_print("\n Serial connection need of a serial port  and a baud rate\n");
-			print_usage();
-			return 4;
-		}
-		else
-		{
-			sport.ttyn=select_serial(serport);
-			sport.bdrate=atoi(baud);
-			sport.mode[0]='8';
-			sport.mode[1]='N';
-			sport.mode[2]='1';
-			sport.mode[3]=0;
-			serial_main(sport, confpin);
-		}
-	}
-
 	if(connection==network)
 	{
 		if(ports==NULL || ip==NULL )
@@ -205,8 +169,7 @@ int main(int argc, char *argv[])
 		{
 			server_main(confpin);
 		}
-	}
-#endif	
+	}	
 	return 0; 
 }
 

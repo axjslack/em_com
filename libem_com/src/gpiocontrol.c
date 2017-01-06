@@ -4,14 +4,13 @@
 #include <unistd.h>
 
 
-
+/*
 #include "gpiocontrol.h"
 #include "pinmesg.h"
-#ifdef LOCALMAPPING
-#include "localmap.h"
-#endif 
 #include "common.h"
+*/
 
+#include "libem_com.h" 
 
 //Library function
 

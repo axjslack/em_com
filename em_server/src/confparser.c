@@ -2,10 +2,11 @@
 #include <stdlib.h>	
 #include <string.h> 
 
-#include "gpiocontrol.h"
+//#include "gpiocontrol.h"
+#include "libem_com.h"
 #include "confparser.h"
 
-#include "common.h"
+//#include "common.h"
 //#define error_print(...) fprintf(stderr, __VA_ARGS__);
 
 #define LOCALCONF "gpiomap.conf"

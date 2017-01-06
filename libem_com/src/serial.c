@@ -3,9 +3,16 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "common.h"
+
 #include "rs232.h"
+
+/*
+#include "common.h"
 #include "pinmesg.h"
+*/
+
+#include "libem_com.h"
+
 
 int select_serial(char *serport)
 {
