@@ -6,10 +6,14 @@
 #include <unistd.h>
 #include <stdint.h>
 
+
+/*
 #include "pinmesg.h"
 #include "common.h"
 
+*/
 
+#include "libem_com.h"
 
 
 int send_pinmesg(pinmsg to_send, int port,  char* ip_add)
