@@ -146,4 +146,15 @@ int select_serial(char *serport);
 
 int spi_single_send_receive(char *spidev, uint32_t spifreq, uint64_t *tx, uint64_t *rx);
 
+
+// I2C Functions
+
+int i2c_write_byte(char *i2cdev, uint16_t slave_address, uint8_t data);
+int i2c_read_byte(char *i2cdev, uint16_t slave_address, uint8_t *data);
+int i2c_write_register(char *i2cdev, uint16_t address, uint8_t reg_address, uint8_t value);
+int i2c_read_register(char *i2cdev, uint16_t address, uint8_t reg_address, uint8_t *data);
+int i2c_write(char *i2cdev, uint16_t slave_address, const uint8_t *buffer, uint32_t count);
+int i2c_read(char *i2cdev, uint16_t slave_address, uint8_t *buffer, uint32_t count);
+
+
 #endif // _LIBEM_COM_H

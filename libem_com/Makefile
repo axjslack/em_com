@@ -14,10 +14,11 @@ LIB_SRC := $(SRCDIR)/gpiocontrol.c \
 $(SRCDIR)/pinmesg.c \
 $(SRCDIR)/serial.c \
 $(SRCDIR)/spidev.c \
+$(SRCDIR)/i2c.c \
 $(SRCDIR)/rs232.c
 #$(SRCDIR)/confparser.c \
 
-LIB_OBJ := gpiocontrol.o confparser.o pinmesg.o serial.o spidev.o rs232.o 
+LIB_OBJ := gpiocontrol.o confparser.o pinmesg.o serial.o spidev.o i2c.o rs232.o 
 
 all : $(LIB)
 
