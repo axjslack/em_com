@@ -90,5 +90,5 @@ void decode_mesg(selector *sel, pinmsg *mesg)
 
 void print_message(pinmsg *to_read)
 {
-	error_print("Selector value: %d  setbit: %lu clearbit: %lu", to_read->slt, to_read->sbit, to_read->cbit);
+	error_print("Selector value: %d  setbit: %u clearbit: %u", to_read->slt, to_read->sbit, to_read->cbit);
 }
