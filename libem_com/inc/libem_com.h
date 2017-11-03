@@ -141,4 +141,9 @@ void print_message(pinmsg *to_read);
 
 int select_serial(char *serport);
 
+
+// SPI Functions
+
+int spi_single_send_receive(char *spidev, uint32_t spifreq, uint64_t *tx, uint64_t *rx);
+
 #endif // _LIBEM_COM_H
