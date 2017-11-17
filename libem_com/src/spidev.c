@@ -27,8 +27,49 @@
 #define CS_DELAY 150
 
 
+//delay, n.bit word
 
-int spi_single_send_receive(char *spidev, uint32_t spifreq, uint64_t *tx, uint64_t *rx)
+
+int spi_single_send(char *spidev, uint32_t spifreq, uint64_t *tx, uint8_t bitword, uint8_t spimode, uint16_t delay)
+{
+	int fd;
+	struct spi_ioc_transfer xfer;
+	int status;
+	
+	xfer.tx_buf = (unsigned long)tx;
+	xfer.cs_change = 0;
+	xfer.len = 1;
+	xfer.bits_per_word=bitword;
+	xfer.speed_hz = spifreq;
+	xfer.delay_usecs=CS_DELAY;
+	
+	fd = open(spidev, O_RDWR);
+	status=ioctl(fd,SPI_IOC_WR_BITS_PER_WORD,&bitword);
+	if(status < 0 )
+	{
+		printf("Unable to set %d WR bits per word\n", bitword);
+	}
+	
+	status = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &spifreq);
+	
+	ioctl(fd, SPI_IOC_WR_MODE, &spimode);
+	if(status < 0 )
+	{
+		printf("Unable to set RD mode %d\n" , spimode);
+	}
+	
+	status = ioctl(fd, SPI_IOC_MESSAGE(1), xfer);
+	if (status < 0) 
+	{
+		perror("SPI_IOC_MESSAGE");
+		return -34;
+	}
+	
+	return 0;
+}
+
+
+int spi_simple_send_receive(char *spidev, uint32_t spifreq, uint64_t *tx, uint64_t *rx)
 
 {
 
