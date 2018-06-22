@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <termios.h>
 
 // GPIOCONTROL define
 
@@ -177,6 +178,7 @@ typedef enum bitword_e bitword_t;
 typedef enum spimode_e spimode_t;
 
 
+
 //This would require --short-enums in compile options
 // Bitfileds are quite unsafe, and have to be tested on multiple arch.
 
@@ -197,6 +199,24 @@ struct __attribute__((__packed__)) spimessage_s {
 };
 
 typedef struct spimessage_s spimsg_t;
+
+
+//New SPI message (8 and 16 bit)
+
+typedef struct spi_mesg16_str{
+	uint16_t *rawmsg;
+	uint16_t *rawansw;
+	uint16_t size;
+	uint16_t answ_size;
+} spi_mesg16_t;
+
+typedef struct spi_mesg8_str{
+	uint8_t *rawmsg;
+	uint8_t *rawansw;
+	uint16_t size;
+	uint16_t answ_size;
+} spi_mesg8_t;
+
 
 
 
@@ -239,12 +259,16 @@ int decode_message(std_msg_t recv);
 
 // COMMON Functions
 
-int select_serial(char *serport);
+// Serial Functions
+int serial_setup(int fd, struct termios *ourserial);
+int send_buffer_serial(int fd, char *msg_to_write, size_t count);
+int receive_buffer_serial(int fd, char *answbuf, size_t count);
+
+
 
 
 // SPI Functions
-int spi_simple_send_receive(char *spidev, uint32_t spifreq, uint64_t *tx, uint64_t *rx);
-int spi_single_send(char *spidev, uint32_t spifreq, uint64_t *tx, uint8_t bitword, uint8_t spimode, uint16_t delay);
+int SPIreadwrite(char *name, uint32_t spifreq, uint8_t spimode, uint8_t bitflag, void *mesg, uint32_t udelay);
 
 
 // I2C Functions

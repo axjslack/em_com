@@ -2,71 +2,98 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <unistd.h>
+#include <errno.h>
+#include <termios.h>
 
-
-#include "rs232.h"
-
-/*
-#include "common.h"
-#include "pinmesg.h"
-*/
 
 #include "libem_com.h"
 
 
-int select_serial(char *serport)
+int serial_setup(int fd, struct termios *ourserial)
 {
-	int ttyn;
 
-	if(strcmp(serport,"ttyS0")== 0) {ttyn= 0; }
-	else if(strcmp(serport, "ttyS1")== 0) {ttyn= 1; }
-	else if(strcmp(serport, "ttyS2")== 0) {ttyn= 2; }
-	else if(strcmp(serport, "ttyS3")== 0) {ttyn= 3; }
-	else if(strcmp(serport, "ttyS4")== 0) {ttyn= 4; }
-	else if(strcmp(serport, "ttyUSB0")== 0) {ttyn= 16; }
-	else if(strcmp(serport, "ttyUSB1")== 0) {ttyn= 17; }
-	else if(strcmp(serport, "ttyUSB2")== 0) {ttyn= 18; }
-	else if(strcmp(serport, "ttyUSB3")== 0) {ttyn= 19; }
-	else if(strcmp(serport, "ttyAMA0")== 0) {ttyn= 22; }
-	else if(strcmp(serport, "ttyAMA1")== 0) {ttyn= 23; }
-	else if(strcmp(serport, "ttyACM0")== 0) {ttyn= 24; }
-	else if(strcmp(serport, "ttyACM1")== 0) {ttyn= 25; }
-	else
-		error_print("\nSerial port not supported\n");
+	tcgetattr(fd, ourserial);
 
-	return ttyn;
+	cfsetispeed(ourserial, B38400);
+	cfsetospeed(ourserial, B38400);
+
+	ourserial->c_cflag |= (CLOCAL | CREAD);
+	// CREAD: enable reciever 
+	// CLOCAL: don't change the owner
+
+	//Parity 8n1 (copied)
+	ourserial->c_cflag &= ~PARENB;
+	ourserial->c_cflag &= ~CSTOPB;
+	ourserial->c_cflag &= ~CSIZE;
+	ourserial->c_cflag |= CS8;
+
+	//Disable Hardware flow control
+	//ourserial->c_cflag &= ~CNEW_RTSCTS;
+
+	//Raw input instead of Canonical input
+	ourserial->c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+	// Disable software flow control
+	ourserial->c_iflag &= ~(IXON | IXOFF | IXANY);
+
+	// Selecting Raw output
+	ourserial->c_oflag &= ~OPOST;
+
+	ourserial->c_cc[VMIN]  = 0;
+	ourserial->c_cc[VTIME] = 10;
+
+	//Setting serial
+	tcsetattr(fd, TCSANOW, ourserial);
+
+	return 0;
 
 }
 
 
-
-int serial_connect(serial_port_t sport, uint8_t *serial_pinmsg)
+int send_buffer_serial(int fd, char *msg_to_write, size_t count)
 {
+	int status;	
 
-	int result,count;
-#ifdef DBG
-	int i;
-#endif	
-
-
-	if(RS232_OpenComport(sport.ttyn, sport.bdrate, sport.mode))
-	  {
-	    error_print("Can not open comport\n");
-	    result=404;
-	  }
-
-	sleep(1);
-
-	count=RS232_PollComport(sport.ttyn, serial_pinmsg, sizeof(pinmsg));
+	status=write(fd, msg_to_write, count);
+	if(status<0)
+	{
+		fprintf(stderr,"Impossible to write buffer\n");
+		return 1;
+	}
+	return 0; 
+}
 	
 
-#ifdef DBG
-	error_print("\n%d byte read from %d at %d Kb/s \n", count, sport.ttyn, sport.bdrate);
-	for(i=0;i<count;i++)
+int receive_buffer_serial(int fd, char *answbuf, size_t count)
+{
+	char *tmpbufptr;
+	int status, i=0;	
+	
+	tmpbufptr=answbuf;
+	while (i<count)
 	{
-		error_print(" %X ", serial_pinmsg[i]);
+		status=read(fd,tmpbufptr, 1);
+		//fprintf(stderr,"%c",*tmpbufptr);
+		if(status<0)
+		{
+	
+			fprintf(stderr, "%s: %s\n",__func__ , strerror(errno));
+			return status;
+		}
+
+
+		i++;
+		tmpbufptr++;
 	}
-#endif
-	return result;
+	//printf("Result : %s \n", answbuf);
+	return 0;
 
 }
+
+
+
+
+
+
+
